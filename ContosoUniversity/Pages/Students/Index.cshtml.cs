@@ -29,7 +29,27 @@ namespace ContosoUniversity.Pages.Students
         public async Task OnGetAsync(string sortOrder)
         {
             NameSort = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            DateSort = sortOrder == "Date" ? "date_desc" : "Date";
+            DateSort = sortOrder == "date" ? "date_desc" : "date";
+            IQueryable<Student> studentsIQ = from s in _context.Students
+                                             select s;
+
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    studentsIQ = studentsIQ.OrderByDescending(s => s.LastName);
+                    break;
+                case "date":
+                    studentsIQ = studentsIQ.OrderBy(s => s.EnrollmentDate);
+                    break;
+                case "date_desc":
+                    studentsIQ = studentsIQ.OrderByDescending(s => s.EnrollmentDate);
+                    break;
+                default:
+                    studentsIQ = studentsIQ.OrderBy(s => s.LastName);
+                    break;
+            }
+
+            Students =await studentsIQ.AsNoTracking().ToListAsync();
         }
     }
 }
